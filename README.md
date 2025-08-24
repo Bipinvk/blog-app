@@ -1,36 +1,129 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js Blog Application
+
+This is a Next.js project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app), featuring a blog system with user authentication, profile management, post creation, updates, deletion, and a like functionality. It uses MongoDB for data storage and NextAuth.js for authentication.
+
+## Features
+- User authentication with email and password using NextAuth.js.
+- Profile management (view and update user details).
+- Post creation, viewing, updating, and deletion with author permissions.
+- Like/unlike functionality for posts.
+- Responsive design with auto-optimized fonts using `next/font`.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js (v18 or later recommended)
+- npm, yarn, pnpm, or bun
+- MongoDB Atlas account (for remote database) or local MongoDB instance
 
-```bash
-npm run dev
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd <repository-name>
+
+Install dependencies:
+bashnpm install
+# or
+yarn install
+# or
+pnpm install
+# or
+bun install
+
+Create a .env.local file in the root directory and add the following environment variables:
+textNEXTAUTH_SECRET=<your-generated-secret> # Generate with: openssl rand -base64 32
+NEXTAUTH_URL=http://localhost:3000
+MONGODB_URI=<your-mongodb-connection-string> # e.g., mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/<db>?retryWrites=true&w=majority
+NODE_ENV=development
+
+Replace <your-generated-secret> with a secure random string.
+Replace <your-mongodb-connection-string> with your MongoDB Atlas or local URI.
+
+
+Seed the database with initial data (optional):
+bashnode -r esbuild-register src/lib/seed.ts
+
+This creates sample users and posts (e.g., admin@example.com with password Admin@123).
+
+
+Run the development server:
+bashnpm run dev
 # or
 yarn dev
 # or
 pnpm dev
 # or
 bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 in your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Login: Visit /login, enter admin@example.com and Admin@123 (or a seeded user) to log in.
+Profile: Navigate to /profile to view and update your profile.
+Posts:
 
-## Learn More
+Create a new post at /posts/new.
+View all posts at /.
+View a specific post at /posts/[id].
+Update a post with PUT /api/posts/[id] (author or admin only).
+Delete a post with DELETE /api/posts/[id] (author or admin only).
+Like/unlike a post with PUT /api/posts/[id] ({ "action": "like" } or { "action": "unlike" }) or DELETE /api/posts/[id]/unlike.
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The page auto-updates as you edit files like app/page.tsx.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Project Structure
 
-## Deploy on Vercel
+app/: Next.js App Router pages and API routes.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+api/: API endpoints (e.g., auth/[...nextauth]/route.ts, posts/[id]/route.ts, profile/route.ts).
+page.tsx: Homepage component.
+profile/page.tsx: Profile page component.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+components/: Reusable React components (e.g., BlogCard, ProfileForm).
+lib/: Utility functions and database connections (e.g., db.ts, seed.ts).
+models/: Mongoose models (e.g., User.ts, Post.ts).
+.env.local: Environment variables.
+
+Learn More
+To learn more about the technologies used:
+
+Next.js Documentation - Learn about Next.js features and API.
+NextAuth.js Documentation - Authentication setup.
+Mongoose Documentation - MongoDB ORM.
+Learn Next.js - Interactive tutorial.
+
+Deploy on Vercel
+The easiest way to deploy your Next.js app is to use the Vercel Platform from the creators of Next.js.
+Deployment Steps
+
+Install Vercel CLI:
+bashnpm install -g vercel
+
+Deploy:
+bashvercel
+
+Set environment variables in the Vercel dashboard:
+
+NEXTAUTH_SECRET
+NEXTAUTH_URL (e.g., https://your-vercel-app.vercel.app)
+MONGODB_URI
+NODE_ENV (set to production)
+
+
+Check the deployment URL provided by Vercel.
+
+For more details, see the Next.js deployment documentation.
+Contributing
+Contributions are welcome! Please fork the repository and submit pull requests. For major changes, please open an issue first to discuss what you would like to change.
+License
+This project is licensed under the MIT License - see the LICENSE file for details.
+Troubleshooting
+
+401 Unauthorized: Ensure .env.local variables are correct, clear browser cookies, and restart the server.
+Build Errors: Check import paths (e.g., authOptions) and ensure all dependencies are installed.
+Database Issues: Verify MONGODB_URI and test with mongosh or a MongoDB client.
