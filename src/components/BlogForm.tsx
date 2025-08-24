@@ -1,31 +1,44 @@
 'use client';
 import { useState } from 'react';
-import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
-interface BlogFormProps {
-  initialTitle?: string;
-  initialContent?: string;
-  onSubmit: (title: string, content: string) => Promise<void>;
-}
-
-export default function BlogForm({ initialTitle = '', initialContent = '', onSubmit }: BlogFormProps) {
+export default function BlogForm({ initialTitle = '', initialContent = '', onSubmit }: { initialTitle?: string; initialContent?: string; onSubmit: (title: string, content: string) => void }) {
   const [title, setTitle] = useState(initialTitle);
   const [content, setContent] = useState(initialContent);
-  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(title, content);
-    router.push('/');
+    setLoading(true);
+    onSubmit(title, content);
+    setLoading(false);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto p-4">
-      <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" className="block mb-2 p-2 border w-full" required />
-      <ReactQuill value={content} onChange={setContent} className="mb-2" />
-      <button type="submit" className="bg-blue-500 text-white p-2">Save</button>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
+        <input
+          id="title"
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          required
+        />
+      </div>
+      <div>
+        <label htmlFor="content" className="block text-sm font-medium text-gray-700">Content</label>
+        <textarea
+          id="content"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-40"
+          required
+        />
+      </div>
+      <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
+        {loading ? 'Submitting...' : 'Submit'}
+      </button>
     </form>
   );
 }

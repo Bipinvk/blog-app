@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '../../auth/[...nextauth]/route';
+import { authOptions } from '../../auth/[...nextauth]/route'; // Changed from { auth }
 import { connectToDB } from '@/lib/db';
 import { Post } from '@/models/Post';
+import getServerSession from 'next-auth';
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -15,8 +16,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
-  const session = await auth();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const session = await getServerSession(authOptions); // Changed from auth()
+  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {
     await connectToDB();
     const post = await Post.findById(params.id);
@@ -36,8 +37,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  const session = await auth();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const session = await getServerSession(authOptions); // Changed from auth()
+  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {
     await connectToDB();
     const post = await Post.findById(params.id);
