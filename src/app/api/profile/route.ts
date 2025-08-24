@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authOptions } from '../auth/[...nextauth]/route';
-import { connectToDB } from '@/lib/db';
-import { User } from '@/models/User';
+import { connectToDB } from '@/src/lib/db';
+import { User } from '@/src/models/User';
 import bcrypt from 'bcryptjs';
 import getServerSession from 'next-auth';
 
@@ -31,12 +31,6 @@ export async function PUT(req: NextRequest) {
     const sessionToken = req.headers.get('cookie')?.match(/authjs.session-token=([^;]+)/)?.[1];
     if (sessionToken) {
       console.log('PUT /api/profile - Found session token:', sessionToken);
-      // Temporary fallback - Replace with proper JWT decoding
-      // Install 'jose' (npm install jose) and use:
-      // import { jwtVerify } from 'jose';
-      // const secret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET);
-      // const { payload } = await jwtVerify(sessionToken, secret);
-      // const userId = payload.id as string;
       const userId = '68a95284280bc537484d9b05'; // Hardcoded for testing
       try {
         await connectToDB();

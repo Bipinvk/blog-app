@@ -2,9 +2,9 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import BlogCard from '@/components/BlogCard';
-import ProfileForm from '@/components/ProfileForm';
-import LoadingSpinner from '@/components/LoadingSpinner';
+import BlogCard from '@/src/components/BlogCard';
+import ProfileForm from '@/src/components/ProfileForm';
+import LoadingSpinner from '@/src/components/LoadingSpinner';
 import Link from 'next/link';
 
 export default function Profile() {

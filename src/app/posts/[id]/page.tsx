@@ -2,9 +2,8 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import LoadingSpinner from '@/components/LoadingSpinner';
-import CommentForm from '@/components/CommentForm';
-
+import LoadingSpinner from '@/src/components/LoadingSpinner';
+import CommentForm from '@/src/components/CommentForm';
 export default function PostDetail({ params }: { params: { id: string } }) {
   const [post, setPost] = useState<any>(null);
   const [comments, setComments] = useState([]);

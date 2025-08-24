@@ -2,8 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import LoadingSpinner from '@/components/LoadingSpinner';
-
+import LoadingSpinner from '@/src/components/LoadingSpinner';
 export default function AdminUsers() {
   const { data: session, status } = useSession();
   const router = useRouter();

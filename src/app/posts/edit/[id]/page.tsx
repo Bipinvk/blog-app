@@ -2,9 +2,8 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import BlogForm from '@/components/BlogForm';
-import LoadingSpinner from '@/components/LoadingSpinner';
-
+import BlogForm from '@/src/components/BlogForm';
+import LoadingSpinner from '@/src/components/LoadingSpinner';
 export default function EditPost({ params }: { params: { id: string } }) {
   const [initialTitle, setInitialTitle] = useState('');
   const [initialContent, setInitialContent] = useState('');

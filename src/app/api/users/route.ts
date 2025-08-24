@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import getServerSession from 'next-auth';
-import { connectToDB } from '@/lib/db';
-import { User } from '@/models/User';
+import { connectToDB } from '@/src/lib/db';
+import { User } from '@/src/models/User';
 import { authOptions } from '../auth/[...nextauth]/route';
 
 export async function GET(req: NextRequest) {

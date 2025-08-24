@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import LoadingSpinner from '@/components/LoadingSpinner';
+import LoadingSpinner from '@/src/components/LoadingSpinner';
 
 export default function Login() {
   const [email, setEmail] = useState('');

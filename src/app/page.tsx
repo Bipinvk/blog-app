@@ -1,8 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import BlogCard from '@/components/BlogCard';
-import LoadingSpinner from '@/components/LoadingSpinner';
-
+import BlogCard from '../components/BlogCard';
+import LoadingSpinner from '../components/LoadingSpinner';
 export default function Home() {
   const [posts, setPosts] = useState([]);
   const [search, setSearch] = useState('');
