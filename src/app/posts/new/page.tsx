@@ -1,9 +1,13 @@
 'use client';
+
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import BlogForm from '@/src/components/BlogForm';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 export default function NewPost() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -19,16 +23,24 @@ export default function NewPost() {
 
   const handleSubmit = async (title: string, content: string) => {
     console.log('NewPost handleSubmit - Session:', session, 'Submitting:', { title, content });
-    const res = await fetch('/api/posts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, content }),
-    });
-    if (res.ok) router.push('/');
-    else {
-      const error = await res.json();
-      console.error('NewPost handleSubmit - Error response:', error);
-      alert(error.error || 'Failed to create post');
+    try {
+      const res = await fetch('/api/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, content }),
+      });
+
+      if (res.ok) {
+        toast.success('Post created successfully! 🎉');
+        setTimeout(() => router.push('/'), 2000); // wait for toast to show
+      } else {
+        const error = await res.json();
+        console.error('NewPost handleSubmit - Error response:', error);
+        toast.error(error.error || 'Failed to create post ❌');
+      }
+    } catch (err) {
+      console.error('NewPost handleSubmit - Exception:', err);
+      toast.error('Something went wrong. Please try again.');
     }
   };
 
@@ -41,6 +53,9 @@ export default function NewPost() {
         </header>
         <BlogForm onSubmit={handleSubmit} />
       </div>
+
+      {/* Toast notifications */}
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
     </div>
   );
 }
