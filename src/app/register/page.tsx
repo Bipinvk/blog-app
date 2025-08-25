@@ -100,6 +100,9 @@ export default function Register() {
             </div>
           </div>
 
+
+          
+
           {/* Error Message */}
           {/* {error && <p className="text-red-500 text-sm text-center">{error}</p>} */}
 
