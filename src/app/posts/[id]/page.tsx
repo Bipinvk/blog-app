@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -18,8 +19,8 @@ export default function PostDetail({ params }: { params: { id: string } }) {
     try {
       setLoading(true);
       const [postRes, commentsRes] = await Promise.all([
-        fetch(`/api/posts/${params.id}`),
-        fetch(`/api/comments?postId=${params.id}`),
+        fetch(`/api/posts/${params.id}`, { credentials: 'include' }), // Ensure cookies are sent
+        fetch(`/api/comments?postId=${params.id}`, { credentials: 'include' }),
       ]);
       if (!postRes.ok || !commentsRes.ok) throw new Error('Failed to fetch');
       const postData = await postRes.json();
@@ -51,12 +52,15 @@ export default function PostDetail({ params }: { params: { id: string } }) {
   const handleDelete = async () => {
     if (!confirm('Are you sure you want to delete this post?')) return;
     try {
-      const res = await fetch(`/api/posts/${post._id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/posts/${post._id}`, {
+        method: 'DELETE',
+        credentials: 'include', // Ensure session cookie is sent
+      });
       if (!res.ok) throw new Error('Failed to delete post');
       toast.success('Post deleted successfully');
       router.push('/');
-    } catch {
-      toast.error('Error deleting post');
+    } catch (err) {
+      toast.error('Error deleting post: ' + (err as Error).message);
     }
   };
 
@@ -64,7 +68,6 @@ export default function PostDetail({ params }: { params: { id: string } }) {
     <div className="min-h-screen pt-20 pb-10 bg-gradient-to-br from-gray-50 to-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
         <article className="bg-white rounded-lg shadow-lg p-8">
-          {/* Post Header */}
           <header className="mb-6 border-b pb-4">
             <h1 className="text-4xl font-bold text-gray-900">{post.title}</h1>
             <p className="text-sm text-gray-500 mt-2">
@@ -73,14 +76,10 @@ export default function PostDetail({ params }: { params: { id: string } }) {
               {new Date(post.updatedAt).toLocaleDateString()}
             </p>
           </header>
-
-          {/* Post Content */}
           <div
             className="prose max-w-none text-gray-700 mb-8"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
-
-          {/* Owner/Admin Actions */}
           {(isOwner || isAdmin) && (
             <div className="flex space-x-4 mb-6">
               <button
@@ -97,8 +96,6 @@ export default function PostDetail({ params }: { params: { id: string } }) {
               </button>
             </div>
           )}
-
-          {/* Comments Section */}
           <section className="mt-8">
             <h2 className="text-2xl font-semibold mb-4">Comments</h2>
             {comments.length > 0 ? (
@@ -119,13 +116,11 @@ export default function PostDetail({ params }: { params: { id: string } }) {
             ) : (
               <p className="text-gray-500">No comments yet.</p>
             )}
-
-            {/* Add Comment */}
             {session && (
               <CommentForm
                 postId={params.id}
                 onCommentAdded={async () => {
-                  await fetchData(); // refresh after adding comment
+                  await fetchData(); // Refresh after adding comment
                 }}
               />
             )}

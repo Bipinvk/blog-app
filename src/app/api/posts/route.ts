@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
+  console.log('POST /api/posts - Received session:', session);
   if (!session?.user) {
     console.log('POST /api/posts - Unauthorized:', { session });
     const sessionToken = req.headers.get('cookie')?.match(/authjs.session-token=([^;]+)/)?.[1];
@@ -57,79 +58,3 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function PUT(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user) {
-    console.log('PUT /api/posts - Unauthorized:', { session });
-    const sessionToken = req.headers.get('cookie')?.match(/authjs.session-token=([^;]+)/)?.[1];
-    if (sessionToken) {
-      console.log('PUT /api/posts - Found session token:', sessionToken);
-      // Temporary fallback - Replace with proper JWT decoding
-      const userId = '68a95284280bc537484d9b05'; // Hardcoded for testing
-      try {
-        await connectToDB();
-        const { title, content } = await req.json();
-        const post = await Post.findOne({ author: userId }); // Find a post by author for update (example logic)
-        if (!post) return NextResponse.json({ error: 'Post not found' }, { status: 404 });
-        post.title = title || post.title;
-        post.content = content || post.content;
-        post.updatedAt = new Date();
-        await post.save();
-        return NextResponse.json(post);
-      } catch (error) {
-        console.error('PUT /api/posts - Fallback error:', error);
-        return NextResponse.json({ error: 'Internal error' }, { status: 500 });
-      }
-    }
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  try {
-    await connectToDB();
-    const { title, content } = await req.json();
-    console.log('PUT /api/posts - Request body:', { title, content });
-    // Note: PUT on /api/posts should target a specific post; consider moving this to /api/posts/[id]
-    const post = await Post.findOne({ author: session.user.id }); // Example: Update the latest post by author
-    if (!post) return NextResponse.json({ error: 'Post not found' }, { status: 404 });
-    post.title = title || post.title;
-    post.content = content || post.content;
-    post.updatedAt = new Date();
-    await post.save();
-    return NextResponse.json(post);
-  } catch (error) {
-    console.error('PUT /api/posts - Error:', error);
-    return NextResponse.json({ error: 'Failed to update post' }, { status: 500 });
-  }
-}
-
-export async function DELETE(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user) {
-    console.log('DELETE /api/posts - Unauthorized:', { session });
-    const sessionToken = req.headers.get('cookie')?.match(/authjs.session-token=([^;]+)/)?.[1];
-    if (sessionToken) {
-      console.log('DELETE /api/posts - Found session token:', sessionToken);
-      const userId = '68a95284280bc537484d9b05'; // Hardcoded for testing
-      try {
-        await connectToDB();
-        const post = await Post.findOne({ author: userId }); // Example: Delete the latest post by author
-        if (!post) return NextResponse.json({ error: 'Post not found' }, { status: 404 });
-        await post.deleteOne();
-        return NextResponse.json({ message: 'Post deleted' });
-      } catch (error) {
-        console.error('DELETE /api/posts - Fallback error:', error);
-        return NextResponse.json({ error: 'Internal error' }, { status: 500 });
-      }
-    }
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  try {
-    await connectToDB();
-    const post = await Post.findOne({ author: session.user.id }); // Example: Delete the latest post by author
-    if (!post) return NextResponse.json({ error: 'Post not found' }, { status: 404 });
-    await post.deleteOne();
-    return NextResponse.json({ message: 'Post deleted' });
-  } catch (error) {
-    console.error('DELETE /api/posts - Error:', error);
-    return NextResponse.json({ error: 'Failed to delete post' }, { status: 500 });
-  }
-}

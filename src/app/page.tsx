@@ -7,14 +7,28 @@ import { Search } from 'lucide-react';
 export default function Home() {
   const [posts, setPosts] = useState([]);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState(''); // 👈 new state for debounce
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Debounce effect for search
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1); // Reset to first page when new search
+    }, 500); // 500ms delay
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [search]);
+
+  // Fetch posts based on debounced search
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/posts?search=${search}&page=${page}&limit=6`)
+    fetch(`/api/posts?search=${debouncedSearch}&page=${page}&limit=6`)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch posts');
         return res.json();
@@ -25,7 +39,7 @@ export default function Home() {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [search, page]);
+  }, [debouncedSearch, page]);
 
   if (loading) return <LoadingSpinner />;
   if (error)
@@ -54,10 +68,7 @@ export default function Home() {
             <input
               type="text"
               value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Search articles by title..."
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />

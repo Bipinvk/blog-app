@@ -38,7 +38,7 @@ export const authOptions = {
   session: { strategy: 'jwt', maxAge: 30 * 24 * 60 * 60, updateAge: 24 * 60 * 60 },
   callbacks: {
     async jwt({ token, user }) {
-      console.log('JWT Callback - Input:', { token, user });
+      console.log('JWT Callback - Input:', { token, user, });
       if (user) {
         token.id = user.id;
         token.role = user.role;
